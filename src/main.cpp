@@ -3,9 +3,11 @@
 #include <EncButton.h>
 
 #include "constants.h"
+#include "effectManager.h"
 
-CRGB leds[NUM_LEDS];
 ButtonT<BTN_PIN> touch;
+LedMatrix matrix(WIDTH, HEIGHT);
+EffectManager effects(&matrix);
 
 float readBatteryVoltage() {
     uint32_t sum = 0;
@@ -27,15 +29,36 @@ void setup() {
     pinMode(BTN_PIN, INPUT);
     analogReadResolution(12);
 
-    FastLED.setBrightness(10);
-    FastLED.addLeds<WS2812B, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
-    FastLED.clear();
-    FastLED.show();
+    delay(100);
+
+    // Вывести список всех эффектов
+    Serial.println("=== Registered Effects ===");
+    for (uint8_t i = 0; i < effects.getEffectCount(); i++) {
+        const EffectDescriptor* desc = effects.getEffectDescriptor(i);
+        Serial.printf("[%d] %s (FPS: %d, Flags: 0x%02X)\n", 
+                    i, desc->name, desc->target_fps, desc->flags);
+    }
+    
+    // Установить начальные параметры
+    EffectParams params;
+    params.brightness = 10;
+    params.speed = 128;
+    params.k_factor = 0;
+    effects.setParams(params);
+    
+    // Установить первый эффект
+    effects.setEffect(0);
 }
 
 void loop() {
+    uint32_t now = millis();
+    
     touch.tick();
-
+    effects.update(now);
     float vbat = readBatteryVoltage();
-    Serial.printf("Battery voltage: %.3f V\n", vbat);
+    
+    if (touch.click()) {
+        Serial.printf("Battery voltage: %.3f V\n", vbat);
+        effects.nextEffect();
+    }
 }
