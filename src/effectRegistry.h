@@ -1,35 +1,39 @@
-#ifndef EFFECT_REGISTRY_H
-#define EFFECT_REGISTRY_H
+#pragma once
 
 #include "effectBase.h"
+#include "constants.h"
 
-// Forward declarations эффектов
-void effect_static_color(LedMatrix& matrix, EffectContext& ctx, uint32_t dt);
-void effect_rainbow(LedMatrix& matrix, EffectContext& ctx, uint32_t dt);
-void effect_fire(LedMatrix& matrix, EffectContext& ctx, uint32_t dt);
+// Forward declarations of effects
+void effect_static_color(CRGB* leds, const EffectParams& params, EffectContext& ctx, uint32_t dt);
+void effect_rainbow(CRGB* leds, const EffectParams& params, EffectContext& ctx, uint32_t dt);
+void effect_fire(CRGB* leds, const EffectParams& params, EffectContext& ctx, uint32_t dt);
+void effect_test_snake(CRGB* leds, const EffectParams& params, EffectContext& ctx, uint32_t dt);
 
-// X-MACRO таблица эффектов
-// Формат: EFFECT(name, function, flags, target_fps)
+// X-MACRO effect registration table
+// Format: EFFECT(name, function, target_fps, default_brightness, default_speed, default_k_factor)
 // 
-// Чтобы добавить новый эффект:
-// 1. Создай файл effects/your_effect.cpp
-// 2. Добавь forward declaration выше
-// 3. Добавь строку EFFECT(...) в таблицу ниже
-// 4. Всё. Компиляция автоматически зарегистрирует эффект.
-//
-#define EFFECT_TABLE \
-    EFFECT("static",  effect_static_color, EFFECT_NONE,                                    60) \
-    EFFECT("rainbow", effect_rainbow,      EFFECT_HAS_SPEED,                               30) \
-    EFFECT("fire",    effect_fire,         EFFECT_HAS_SPEED | EFFECT_HAS_KFACTOR,          24)
+// To add a new effect:
+// 1. Create file effects/your_effect.cpp
+// 2. Add forward declaration above
+// 3. Add EFFECT(...) line to table below
+// 4. Done. Compilation will automatically register the effect.
 
-// Генерация массива дескрипторов в compile-time
-#define EFFECT(name, func, flags, fps) {name, func, flags, fps},
-static const EffectDescriptor EFFECT_REGISTRY[] = {
+
+//                                                 FPS  Br  Spd  Kf
+#define EFFECT_TABLE \
+    EFFECT("static",        effect_static_color,    60, 10, 128,    0) \
+    EFFECT("rainbow",       effect_rainbow,         60, 10, 100,    0) \
+    EFFECT("fire",          effect_fire,            30, 10, 120,  -30) \
+    EFFECT("test_snake",    effect_test_snake,      30, 10,  50,    0)
+
+// Generate descriptor array at compile-time
+#define EFFECT(name, func, fps, br, spd, kf) \
+    {name, func, fps, EffectParams(br, spd, kf)},
+
+static const EffectDescriptor EFFECT_REGISTRY[] PROGMEM = {
     EFFECT_TABLE
 };
 #undef EFFECT
 
-// Количество зарегистрированных эффектов
+// Number of registered effects
 #define EFFECT_COUNT (sizeof(EFFECT_REGISTRY) / sizeof(EffectDescriptor))
-
-#endif // EFFECT_REGISTRY_H

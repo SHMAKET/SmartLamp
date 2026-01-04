@@ -1,19 +1,17 @@
 // effects/fire.cpp
-// Сложный эффект: симуляция огня
-// Использует: brightness, speed, k_factor
+// Complex effect: fire simulation
+// Uses: brightness, speed, k_factor
 
 #include "../effectBase.h"
-#include <stdlib.h>
+#include "../constants.h"
 
-// Внутреннее состояние эффекта
+// Internal state for fire effect
 struct FireState {
-    uint8_t* heat_map;  // Тепловая карта
-    uint16_t width;
-    uint16_t height;
+    uint8_t* heat_map;  // Heat map buffer
     
-    FireState(uint16_t w, uint16_t h) : width(w), height(h) {
-        heat_map = new uint8_t[w * h];
-        memset(heat_map, 0, w * h);
+    FireState() {
+        heat_map = new uint8_t[NUM_LEDS];
+        memset(heat_map, 0, NUM_LEDS);
     }
     
     ~FireState() {
@@ -21,105 +19,80 @@ struct FireState {
     }
 };
 
-// Палитра огня (черный -> красный -> оранжевый -> желтый -> белый)
-void fire_palette(uint8_t heat, uint8_t& r, uint8_t& g, uint8_t& b) {
-    // heat: 0-255
-    
+// Fire color palette (black → red → orange → yellow → white)
+CRGB fire_palette(uint8_t heat) {
     if (heat < 85) {
-        // Черный -> темно-красный
-        r = heat * 3;
-        g = 0;
-        b = 0;
+        // Black → dark red
+        return CRGB(heat * 3, 0, 0);
     } else if (heat < 170) {
-        // Темно-красный -> оранжевый
+        // Dark red → orange  
         heat -= 85;
-        r = 255;
-        g = heat * 3;
-        b = 0;
+        return CRGB(255, heat * 3, 0);
     } else {
-        // Оранжевый -> желтый -> белый
+        // Orange → yellow → white
         heat -= 170;
-        r = 255;
-        g = 255;
-        b = heat * 3;
+        return CRGB(255, 255, heat * 3);
     }
 }
 
-inline long random(long min, long max) {
-    return min + (random() % (max - min));
-}
-
-void effect_fire(LedMatrix& matrix, EffectContext& ctx, uint32_t dt) {
-    uint16_t width = matrix.getWidth();
-    uint16_t height = matrix.getHeight();
-    
-    // Инициализация состояния при первом кадре
+void effect_fire(CRGB* leds, const EffectParams& params, EffectContext& ctx, uint32_t dt) {
+    // Initialize state on first frame
     if (ctx.state == nullptr) {
-        ctx.state = new FireState(width, height);
+        ctx.state = new FireState();
     }
     
     FireState* state = (FireState*)ctx.state;
     
-    // Параметры:
-    // speed: 0-255 → скорость распространения огня (128 = средняя)
-    // k_factor: -128..127 → интенсивность охлаждения
-    //   k_factor < 0 = медленное охлаждение (высокое пламя)
-    //   k_factor > 0 = быстрое охлаждение (низкое пламя)
+    // Parameters:
+    // speed: 0-255 → fire spread speed (128 = medium)
+    // k_factor: -128..127 → cooling intensity
+    //   k_factor < 0 = slow cooling (tall flames)
+    //   k_factor > 0 = fast cooling (short flames)
     
-    uint8_t cooling = 55 + ctx.params.k_factor / 4;  // 23..87
-    uint8_t sparking = 120 + ctx.params.speed / 2;   // 120..247
+    uint8_t cooling = 55 + params.k_factor / 4;  // 23..87
+    uint8_t sparking = 120 + params.speed / 2;   // 120..247
     
-    // Шаг 1: Охлаждение (сверху вниз)
-    for (uint16_t y = 0; y < height; y++) {
-        for (uint16_t x = 0; x < width; x++) {
-            uint8_t cooldown = random(0, cooling);
-            uint16_t idx = y * width + x;
-            
-            if (state->heat_map[idx] > cooldown) {
-                state->heat_map[idx] -= cooldown;
-            } else {
-                state->heat_map[idx] = 0;
-            }
+    // Step 1: Cool down (top to bottom)
+    for (uint16_t i = 0; i < NUM_LEDS; i++) {
+        uint8_t cooldown = random8(0, cooling);
+        if (state->heat_map[i] > cooldown) {
+            state->heat_map[i] -= cooldown;
+        } else {
+            state->heat_map[i] = 0;
         }
     }
     
-    // Шаг 2: Поднятие тепла вверх (диффузия)
-    for (uint16_t y = height - 1; y >= 2; y--) {
-        for (uint16_t x = 0; x < width; x++) {
-            uint16_t idx = y * width + x;
-            uint16_t idx_below = (y - 1) * width + x;
+    // Step 2: Heat rises (diffusion)
+    for (uint16_t y = HEIGHT - 1; y >= 2; y--) {
+        for (uint16_t x = 0; x < WIDTH; x++) {
+            uint16_t idx = XY(x, y);
+            uint16_t idx_below = XY(x, y - 1);
+            uint16_t idx_left = (x > 0) ? XY(x - 1, y - 1) : idx_below;
+            uint16_t idx_up = XY(x, y - 2);
             
             state->heat_map[idx] = (state->heat_map[idx_below] + 
-                                    state->heat_map[idx_below - 1] + 
+                                    state->heat_map[idx_left] + 
                                     state->heat_map[idx_below] + 
-                                    state->heat_map[idx - width]) / 4;
+                                    state->heat_map[idx_up]) / 4;
         }
     }
     
-    // Шаг 3: Новые искры внизу
-    for (uint16_t x = 0; x < width; x++) {
-        if (random(0, 255) < sparking) {
-            uint16_t idx = x;
-            state->heat_map[idx] = random(160, 255);
+    // Step 3: Randomly ignite new sparks at bottom
+    for (uint16_t x = 0; x < WIDTH; x++) {
+        if (random8() < sparking) {
+            uint16_t idx = XY(x, 0);
+            state->heat_map[idx] = random8(160, 255);
         }
     }
     
-    // Шаг 4: Отрисовка на LED матрицу
-    for (uint16_t y = 0; y < height; y++) {
-        for (uint16_t x = 0; x < width; x++) {
-            uint16_t idx = y * width + x;
-            uint8_t heat = state->heat_map[idx];
-            
-            uint8_t r, g, b;
-            fire_palette(heat, r, g, b);
-            matrix.setPixel(x, y, r, g, b);
-        }
+    // Step 4: Render to LED matrix
+    for (uint16_t i = 0; i < NUM_LEDS; i++) {
+        leds[i] = fire_palette(state->heat_map[i]);
     }
+    
+    // Apply brightness
+    FastLED.setBrightness(params.brightness);
 }
 
-// ВАЖНО: При удалении эффекта нужно очистить state
-// Это делается в твоем коде при переключении:
-// if (ctx.state) {
-//     delete (FireState*)ctx.state;
-//     ctx.state = nullptr;
-// }
+// NOTE: State cleanup happens automatically in EffectManager::setEffect()
+// when switching to a different effect

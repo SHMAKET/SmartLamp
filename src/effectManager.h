@@ -1,46 +1,47 @@
-#ifndef EFFECT_MANAGER_H
-#define EFFECT_MANAGER_H
+#pragma once
 
 #include "effectBase.h"
 #include "effectRegistry.h"
+#include "constants.h"
 
 class EffectManager {
 private:
-    LedMatrix* matrix;
+    CRGB* leds;                    // FastLED array
     uint8_t current_effect_id;
+    EffectParams current_params;    // Current effect parameters (can change anytime)
     EffectContext context;
     uint32_t last_frame_time;
     uint32_t frame_interval_ms;
-    CRGB leds[NUM_LEDS];
     
 public:
-    EffectManager(LedMatrix* m) 
-        : matrix(m)
+    EffectManager(CRGB* led_array) 
+        : leds(led_array)
         , current_effect_id(0)
         , last_frame_time(0)
-        , frame_interval_ms(16)  // 60 FPS по умолчанию
+        , frame_interval_ms(16)  // 60 FPS default
     {
-        FastLED.addLeds<WS2812B, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+        // Load default parameters for first effect
+        loadDefaultParams(0);
     }
     
-    // Получить количество эффектов
+    // Get number of effects
     uint8_t getEffectCount() const {
         return EFFECT_COUNT;
     }
     
-    // Получить дескриптор эффекта по ID
+    // Get effect descriptor by ID
     const EffectDescriptor* getEffectDescriptor(uint8_t id) const {
         if (id >= EFFECT_COUNT) return nullptr;
         return &EFFECT_REGISTRY[id];
     }
     
-    // Получить имя эффекта по ID
+    // Get effect name by ID
     const char* getEffectName(uint8_t id) const {
         const EffectDescriptor* desc = getEffectDescriptor(id);
         return desc ? desc->name : nullptr;
     }
     
-    // Найти ID эффекта по имени
+    // Find effect ID by name
     int8_t findEffectByName(const char* name) const {
         for (uint8_t i = 0; i < EFFECT_COUNT; i++) {
             if (strcmp(EFFECT_REGISTRY[i].name, name) == 0) {
@@ -50,19 +51,30 @@ public:
         return -1;
     }
     
-    // Текущий эффект
+    // Current effect ID
     uint8_t getCurrentEffectId() const {
         return current_effect_id;
     }
     
-    // Переключить эффект
+    // Switch effect
     bool setEffect(uint8_t id) {
         if (id >= EFFECT_COUNT) return false;
+        
+        // Clean up old effect state if exists
+        if (context.state) {
+            // Note: specific cleanup depends on effect implementation
+            // Each effect should handle its own state cleanup
+            free(context.state);
+            context.state = nullptr;
+        }
         
         current_effect_id = id;
         context.reset();
         
-        // Установить целевой FPS
+        // Load default parameters for new effect
+        loadDefaultParams(id);
+        
+        // Set target FPS
         const EffectDescriptor* desc = getEffectDescriptor(id);
         if (desc) {
             frame_interval_ms = 1000 / desc->target_fps;
@@ -71,12 +83,12 @@ public:
         return true;
     }
     
-    // Следующий эффект (циклично)
+    // Next effect (cyclic)
     void nextEffect() {
         setEffect((current_effect_id + 1) % EFFECT_COUNT);
     }
     
-    // Предыдущий эффект (циклично)
+    // Previous effect (cyclic)
     void prevEffect() {
         if (current_effect_id == 0) {
             setEffect(EFFECT_COUNT - 1);
@@ -85,75 +97,72 @@ public:
         }
     }
     
-    // Получить параметры текущего эффекта
+    // Get current effect parameters (for reading/writing)
     EffectParams& getParams() {
-        return context.params;
+        return current_params;
     }
     
-    // Установить параметры
+    // Set parameters (immediate effect, no delay)
     void setParams(const EffectParams& params) {
-        context.params = params;
+        current_params = params;
+        // TODO: нахера это проверка?
+        current_params.validate();
     }
     
-    // Получить флаги текущего эффекта
-    uint8_t getCurrentEffectFlags() const {
-        const EffectDescriptor* desc = getEffectDescriptor(current_effect_id);
-        return desc ? desc->flags : 0;
+    // Set individual parameters (for convenience)
+    void setBrightness(uint8_t value) {
+        current_params.brightness = value;
     }
     
-    // Проверить, использует ли текущий эффект параметр
-    bool hasSpeed() const {
-        return getCurrentEffectFlags() & EFFECT_HAS_SPEED;
+    void setSpeed(uint8_t value) {
+        current_params.speed = value;
     }
     
-    bool hasKFactor() const {
-        return getCurrentEffectFlags() & EFFECT_HAS_KFACTOR;
+    void setKFactor(int8_t value) {
+        current_params.k_factor = value;
     }
     
-    // Главный цикл обновления (вызывать в loop())
+    // Load default parameters for effect
+    void loadDefaultParams(uint8_t id) {
+        const EffectDescriptor* desc = getEffectDescriptor(id);
+        if (desc) {
+            current_params = desc->default_params;
+        }
+    }
+    
+    // Main update loop (call in loop())
     void update(uint32_t current_time_ms) {
         uint32_t dt = current_time_ms - last_frame_time;
         
-        // Ограничение FPS
+        // FPS limiting
         if (dt < frame_interval_ms) {
             return;
         }
         
-        // Вызвать функцию текущего эффекта
+        // Call current effect function
         const EffectDescriptor* desc = getEffectDescriptor(current_effect_id);
         if (desc && desc->function) {
-            desc->function(*matrix, context, dt);
+            // Effect receives current parameters (can be changed anytime)
+            desc->function(leds, current_params, context, dt);
             
-            // Применить глобальную яркость
-            matrix->applyBrightness(context.params.brightness);
-            
-            // Обновить счетчики
+            // Update counters
             context.frame_count++;
             context.elapsed_ms += dt;
         }
         
         last_frame_time = current_time_ms;
         
-        // Здесь должна быть отправка данных на WS2812
-        // Это твоя зона ответственности, например:
-        // FastLED.show();
-        // или
-        // neopixelWrite(...);
-
-        uint8_t * buffer = matrix->getBuffer();
-
-        for (int i = 0; i < NUM_LEDS; i++) {
-            // берем 3 байта на каждый светодиод
-            leds[i] = CRGB(buffer[i*3], buffer[i*3+1], buffer[i*3+2]);
-        }
-        FastLED.show();
+        // FastLED.show() should be called in your main loop after this
     }
     
-    // Форсировать обновление (игнорируя FPS limit)
+    // Force update (ignore FPS limit)
     void forceUpdate(uint32_t current_time_ms) {
         last_frame_time = 0;
         update(current_time_ms);
     }
+    
+    // Get frame interval for current effect
+    uint32_t getFrameInterval() const {
+        return frame_interval_ms;
+    }
 };
-
-#endif // EFFECT_MANAGER_H

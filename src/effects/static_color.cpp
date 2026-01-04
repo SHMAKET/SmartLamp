@@ -1,16 +1,18 @@
 // effects/static_color.cpp
-// Простейший эффект: статичный цвет
-// Использует только: brightness (обязательный)
+// Simple effect: static white color
+// Uses: brightness (controls overall brightness)
 
 #include "../effectBase.h"
+#include "../constants.h"
 
-void effect_static_color(LedMatrix& matrix, EffectContext& ctx, uint32_t dt) {
-    // Заполнить всю матрицу белым цветом
-    // Яркость будет применена автоматически в EffectManager
-    matrix.fill(255, 255, 255);
+void effect_static_color(CRGB* leds, const EffectParams& params, EffectContext& ctx, uint32_t dt) {
+    // Fill entire matrix with white color at specified brightness
+    fill_solid(leds, NUM_LEDS, CRGB::White);
     
-    // Если нужен другой цвет, можно добавить логику:
-    // matrix.fill(255, 0, 0);  // Красный
-    // matrix.fill(0, 255, 0);  // Зеленый
-    // matrix.fill(0, 0, 255);  // Синий
+    // Apply brightness to all LEDs
+    FastLED.setBrightness(params.brightness);
+    
+    // For different colors, use:
+    // fill_solid(leds, NUM_LEDS, CRGB::Red);
+    // fill_solid(leds, NUM_LEDS, CRGB(255, 128, 0)); // Orange
 }
