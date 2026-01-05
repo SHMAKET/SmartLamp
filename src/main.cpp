@@ -9,7 +9,9 @@ CRGB leds[NUM_LEDS];
 EffectManager effects(leds);
 GButton touch(BTN_PIN, LOW_PULL, NORM_OPEN);
 
-bool OnFlag = false;
+enum class LampState : uint8_t { OFF, ON };
+
+LampState currentState = LampState::OFF;
 
 float readBatteryVoltage() {
     uint32_t sum = 0;
@@ -60,24 +62,28 @@ void setup() {
 
 void loop() {
     touch.tick();
-    uint8_t clickCount = touch.hasClicks() ? touch.getClicks() : 0U;
-    uint32_t now = millis();
-
-    if (OnFlag) {
-        if (clickCount == 2U) { effects.prevEffect(); }
-        if (clickCount == 3U) { effects.nextEffect(); }
-        effects.update(now);
-    }
-
-    if (clickCount == 1U) {
-        OnFlag = !OnFlag;
-        if (OnFlag) {
+    
+    // single click — on/off
+    if (touch.isSingle()) {
+        if (currentState == LampState::OFF) {
+            currentState = LampState::ON;
             float vbat = readBatteryVoltage();
             Serial.printf("Battery voltage: %.3f V\n", vbat);
         } else {
+            currentState = LampState::OFF;
             FastLED.clear();
+            FastLED.show();
         }
     }
     
-    FastLED.show();
+    // processing clicks only when lamp ON
+    if (currentState == LampState::ON) {
+        switch (touch.hasClicks() ? touch.getClicks() : 0U) {
+            case 2U: effects.nextEffect(); break;
+            case 3U: effects.prevEffect(); break;
+        }
+        
+        uint32_t now = millis();
+        if (effects.update(now)) { FastLED.show(); }
+    }
 }

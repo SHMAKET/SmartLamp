@@ -131,12 +131,12 @@ public:
     }
     
     // Main update loop (call in loop())
-    void update(uint32_t current_time_ms) {
+    bool update(uint32_t current_time_ms) {
         uint32_t dt = current_time_ms - last_frame_time;
         
         // FPS limiting
         if (dt < frame_interval_ms) {
-            return;
+            return 0;
         }
         
         // Call current effect function
@@ -153,6 +153,7 @@ public:
         last_frame_time = current_time_ms;
         
         // FastLED.show() should be called in your main loop after this
+        return 1;
     }
     
     // Force update (ignore FPS limit)
