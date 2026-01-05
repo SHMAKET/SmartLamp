@@ -17,6 +17,10 @@
 #define NTP_ADDRESS         ("ru.pool.ntp.org")     // сервер времени. если не работает, пробуйте "time.windows.com"
 #define NTP_INTERVAL        (90 * 60UL * 1000UL)    // интервал синхронизации времени
 
+#define UB_DEB_TIME         20          // (мс) дебаунс
+#define UB_HOLD_TIME        500         // (мс) время до перехода в состояние "удержание"
+#define UB_CLICK_TIME       300         // (мс) ожидание кликов
+
 // ================== devoloper  settings ================== 
 
 #define ADC_MAX             4095.0

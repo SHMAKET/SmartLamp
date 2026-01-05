@@ -1,13 +1,13 @@
-#include <Arduino.h>
-#include <FastLED.h>
-#include <uButton.h>
-
 #include "constants.h"
 #include "effectManager.h"
 
+#include <Arduino.h>
+#include <FastLED.h>
+#include <GyverButton.h>
+
 CRGB leds[NUM_LEDS];
 EffectManager effects(leds);
-uButton touch(BTN_PIN);
+GButton touch(BTN_PIN, LOW_PULL, NORM_OPEN);
 
 float readBatteryVoltage() {
     uint32_t sum = 0;
@@ -15,7 +15,6 @@ float readBatteryVoltage() {
 
     for (int i = 0; i < samples; i++) {
         sum += analogRead(ADC_PIN);
-        //delayMicroseconds(200);
     }
 
     float adc = sum / (float)samples;
@@ -32,7 +31,10 @@ void setup() {
     FastLED.clear();
     FastLED.show();
 
-    pinMode(BTN_PIN, INPUT);
+    touch.setDebounce(UB_DEB_TIME);
+    touch.setTimeout(UB_HOLD_TIME);
+    touch.setClickTimeout(UB_CLICK_TIME);
+
     analogReadResolution(12);
 
     delay(500);
@@ -57,14 +59,14 @@ void setup() {
 void loop() {
     uint32_t now = millis();
     
-    if (touch.click()) {
+    if (touch.isClick()) {
         effects.nextEffect();
         
         float vbat = readBatteryVoltage();
         Serial.printf("Battery voltage: %.3f V\n", vbat);
     }
     
-    touch.tickRaw();
     effects.update(now);
     FastLED.show();
+    touch.tick();
 }
