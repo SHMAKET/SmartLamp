@@ -21,10 +21,10 @@ void effect_sinusoid (CRGB* leds, const EffectParams& params, EffectContext& ctx
 
 //                                                 FPS  Br  Spd  Kf
 #define EFFECT_TABLE \
-    EFFECT("static",        effect_static_color,    60, 10, 128, 0) \
-    EFFECT("rainbow",       effect_rainbow,         60, 10, 100, 0) \
+    EFFECT("static",        effect_static_color,    60, 10,   1, 0) \
     EFFECT("fire",          effect_fire,            60, 10, 120, 0) \
-    EFFECT("sinusoid",      effect_sinusoid,        60, 10, 120, 0)
+    EFFECT("rainbow",       effect_rainbow,         60, 10, 120, 0) \
+    EFFECT("sinusoid",      effect_sinusoid,        60, 10, 120, -80)
 
 // Generate descriptor array at compile-time
 #define EFFECT(name, func, fps, br, spd, kf) \
