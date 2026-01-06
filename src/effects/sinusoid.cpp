@@ -1,4 +1,3 @@
-/// Sinusoid3 by Stefan Petrick (mod by Palpalych, Stepko, SottNick)
 // Original: https://github.com/gunner47/GyverLamp/blob/master/firmware/GyverLamp_v1.4/effects.ino
 // Read more: https://www.youtube.com/watch?v=mubH-w_gwdA
 //

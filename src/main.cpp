@@ -44,7 +44,7 @@ void setup() {
     }
     
     // Set first effect with its default parameters
-    effects.setEffect(4);
+    effects.setEffect(2);
 
     Serial.println("\nSystem ready!");
 }
