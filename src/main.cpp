@@ -1,9 +1,11 @@
 #include "constants.h"
-#include "effectManager.h"
 
 #include <Arduino.h>
 #include <FastLED.h>
 #include <GyverButton.h>
+
+#include "effectManager.h"
+#include "batteryManager.h"
 
 CRGB leds[NUM_LEDS];
 EffectManager effects(leds);
@@ -12,19 +14,6 @@ GButton touch(BTN_PIN, LOW_PULL, NORM_OPEN);
 enum class LampState : uint8_t { OFF, ON };
 
 LampState currentState = LampState::OFF;
-
-float readBatteryVoltage() {
-    uint32_t sum = 0;
-    const int samples = 32;
-
-    for (int i = 0; i < samples; i++) {
-        sum += analogRead(ADC_PIN);
-    }
-
-    float adc = sum / (float)samples;
-    float vadc = adc / ADC_MAX * ADC_REF;
-    return vadc * DIVIDER_RATIO;
-}
 
 void setup() {
     Serial.begin(115200);
@@ -68,7 +57,7 @@ void loop() {
         if (currentState == LampState::OFF) {
             currentState = LampState::ON;
             float vbat = readBatteryVoltage();
-            Serial.printf("Battery voltage: %.3f V\n", vbat);
+            Serial.printf("Battery voltage: %.1fV %d%%\n", vbat, voltage2Percent(vbat));
         } else {
             currentState = LampState::OFF;
             FastLED.clear();
