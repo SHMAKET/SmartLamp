@@ -8,6 +8,7 @@ void effect_static_color(CRGB* leds, const EffectParams& params, EffectContext& 
 void effect_rainbow(CRGB* leds, const EffectParams& params, EffectContext& ctx, uint32_t dt);
 void effect_fire(CRGB* leds, const EffectParams& params, EffectContext& ctx, uint32_t dt);
 void effect_test_snake(CRGB* leds, const EffectParams& params, EffectContext& ctx, uint32_t dt);
+void effect_sinusoid (CRGB* leds, const EffectParams& params, EffectContext& ctx, uint32_t dt);
 
 // X-MACRO effect registration table
 // Format: EFFECT(name, function, target_fps, default_brightness, default_speed, default_k_factor)
@@ -24,7 +25,8 @@ void effect_test_snake(CRGB* leds, const EffectParams& params, EffectContext& ct
     EFFECT("static",        effect_static_color,    60, 10, 128,    0) \
     EFFECT("rainbow",       effect_rainbow,         60, 10, 100,    0) \
     EFFECT("fire",          effect_fire,            30, 10, 120,  -30) \
-    EFFECT("test_snake",    effect_test_snake,      30, 10,  50,    0)
+    EFFECT("test_snake",    effect_test_snake,      30, 10,  50,    0) \
+    EFFECT("sinusoid",      effect_sinusoid,        60, 20, 120,  -80)
 
 // Generate descriptor array at compile-time
 #define EFFECT(name, func, fps, br, spd, kf) \

@@ -13,7 +13,7 @@ GButton touch(BTN_PIN, LOW_PULL, NORM_OPEN);
 
 enum class LampState : uint8_t { OFF, ON };
 
-LampState currentState = LampState::OFF;
+LampState currentState = LampState::ON;
 
 void setup() {
     Serial.begin(115200);
@@ -44,7 +44,7 @@ void setup() {
     }
     
     // Set first effect with its default parameters
-    effects.setEffect(2);
+    effects.setEffect(4);
 
     Serial.println("\nSystem ready!");
 }
