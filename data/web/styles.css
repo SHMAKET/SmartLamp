@@ -1,0 +1,120 @@
+[data-bs-theme="dark"] {
+    color-scheme: dark;
+    /* Base */
+    --bs-body-bg: #000000;      /* --background */
+    --bs-body-color: #dedafc;   /* --text */
+    /* Brand */
+    --bs-primary: #8675f4;      /* --primary */
+    --bs-secondary: #9b0d45;    /* --secondary */
+    /* Accent / state */
+    --bs-danger: #ed3d2b;       /* --accent */
+    --bs-warning: #9b0d45;
+    /* Text */
+    --bs-emphasis-color: #ffffff;
+    --bs-secondary-color: rgba(222, 218, 252, 0.75);
+    --bs-tertiary-color: rgba(222, 218, 252, 0.5);
+    /* Background layers */
+    --bs-secondary-bg: #111111;
+    --bs-tertiary-bg: #1a1a1a;
+    /* Links */
+    --bs-link-color: #8675f4;
+    --bs-link-hover-color: #b3a8fa;
+    /* Borders */
+    --bs-border-color: rgba(222, 218, 252, 0.2);
+}
+
+[data-bs-theme="light"] {
+    color-scheme: light;
+    /* Base */
+    --bs-body-bg: #ffffff;      /* --background */
+    --bs-body-color: #070326;   /* --text */
+    /* Brand */
+    --bs-primary: #1c0b89;      /* --primary */
+    --bs-secondary: #f2639d;    /* --secondary */
+    /* Accent / state */
+    --bs-danger: #d32612;       /* --accent */
+    --bs-warning: #f2639d;
+    /* Text */
+    --bs-emphasis-color: #070326;
+    --bs-secondary-color: rgba(7, 3, 38, 0.7);
+    --bs-tertiary-color: rgba(7, 3, 38, 0.45);
+    /* Background layers */
+    --bs-secondary-bg: #f6f6fa;
+    --bs-tertiary-bg: #ededf5;
+    /* Links */
+    --bs-link-color: #1c0b89;
+    --bs-link-hover-color: #12075c;
+    /* Borders */
+    --bs-border-color: rgba(7, 3, 38, 0.15);
+}
+
+
+
+body {
+    transition: background-color 0.5s ease, color 0.5s ease;
+    background-color: var(--bs-body-bg);
+}
+
+/* ==========================================================
+    THEME SWITHER BUTTON
+========================================================== */
+.btn {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    padding: 0;
+}
+
+.btn:active {
+    border: none;
+}
+
+.btn-accent {
+    border: none;
+    z-index: 1;
+}
+.btn-accent:hover {
+    opacity: 0.5;
+}
+
+#theme-toggle {
+    transition: transform 0.3s ease;
+}
+
+#theme-toggle.rotate {
+    transform: rotate(360deg);
+    position: relative;
+    padding: 0;
+}
+
+.icon {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.sun {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+.moon {
+    opacity: 0;
+    transform: rotate(-90deg);
+}
+
+[data-bs-theme="dark"] .sun {
+    opacity: 0;
+    transform: rotate(90deg);
+}
+
+[data-bs-theme="dark"] .moon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+/* ==========================================================
+    THEME SWITHER BUTTON
+========================================================== */

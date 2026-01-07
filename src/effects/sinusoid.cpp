@@ -270,6 +270,6 @@ void effect_sinusoid(CRGB* leds, const EffectParams& params, EffectContext& ctx,
             break;
     }
     
-    // Apply brightness
+    // Apply brightness TODO: move to effectManager
     FastLED.setBrightness(params.brightness);
 }

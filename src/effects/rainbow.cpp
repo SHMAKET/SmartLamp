@@ -51,7 +51,7 @@ void effect_rainbow(CRGB* leds, const EffectParams& params, EffectContext& ctx, 
       }
   }
 */
-  // Apply brightness
+  // Apply brightness TODO: move to effectManager
   FastLED.setBrightness(params.brightness);
 }
 

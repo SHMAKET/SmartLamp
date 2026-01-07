@@ -167,6 +167,6 @@ void effect_fire(CRGB* leds, const EffectParams& params, EffectContext& ctx, uin
         }
     }
 
-    // Apply global brightness
+    // Apply global brightness TODO: move to effectManager
     FastLED.setBrightness(params.brightness);
 }

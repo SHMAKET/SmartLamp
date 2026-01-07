@@ -9,7 +9,7 @@ void effect_static_color(CRGB* leds, const EffectParams& params, EffectContext& 
     // Fill entire matrix with white color at specified brightness
     fill_solid(leds, NUM_LEDS, CRGB::White);
     
-    // Apply brightness to all LEDs
+    // Apply brightness to all LEDs TODO: move to effectManager
     FastLED.setBrightness(params.brightness);
     
     // For different colors, use:
