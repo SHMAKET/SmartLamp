@@ -44,7 +44,7 @@ void setup() {
     }
     
     // Set first effect with its default parameters
-    effects.setEffect(0);
+    effects.setEffect(2);
 
     Serial.println("\nSystem ready!");
 }
@@ -57,7 +57,7 @@ void loop() {
         if (currentState == LampState::OFF) {
             currentState = LampState::ON;
             float vbat = readBatteryVoltage();
-            Serial.printf("Battery voltage: %.1fV %d%%\n", vbat, voltage2Percent(vbat));
+            Serial.printf("Battery voltage: %.2fV %d%%\n", vbat, voltage2Percent(vbat));
         } else {
             currentState = LampState::OFF;
             FastLED.clear();
