@@ -1,7 +1,7 @@
 #pragma once
 
-#define LED_PIN             0           // пин ленты
-#define BTN_PIN             1           // пин кнопки
+#define LED_PIN             14           // пин ленты
+#define BTN_PIN             15           // пин кнопки
 #define ADC_PIN             3           // пин акб через делитель
 
 #define WIDTH               ( 16U )     // ширина матрицы
@@ -20,6 +20,10 @@
 #define UB_DEB_TIME         20          // (мс) дебаунс
 #define UB_HOLD_TIME        500         // (мс) время до перехода в состояние "удержание"
 #define UB_CLICK_TIME       300         // (мс) ожидание кликов
+
+#define AP_SSID             "SmartLamp"             // SSID wifi AP
+#define AP_PASS             "31415926"              // password wifi AP
+
 
 // ================== devoloper  settings ================== 
 
