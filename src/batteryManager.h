@@ -1,5 +1,40 @@
 #include "constants.h"
 #include <Arduino.h>
+#include <Adafruit_INA219.h>
+#include <Wire.h>
+
+Adafruit_INA219 ina219;
+
+void InitIna219() {
+    Wire.begin(SDA_PIN, SCL_PIN);
+    Wire.setClock(400000);
+    pinMode(ADC_PIN, INPUT);
+
+    if (!ina219.begin()) {       
+        Serial.println("Failed to find INA219 chip");  
+    }
+}
+
+String InaGet() {
+    float shuntvoltage = 0;     // Создаем переменную shuntvoltage 
+    float busvoltage = 0;       // Создаем переменную busvoltage 
+    float current_mA = 0;       // Создаем переменную current_mA 
+    float loadvoltage = 0;      // Создаем переменную loadvoltage
+    float power_mW = 0;         // Создаем переменную power_mW 
+    
+    shuntvoltage = ina219.getShuntVoltage_mV();       // Получение напряжение на шунте 
+    busvoltage = ina219.getBusVoltage_V();            // Получение значение напряжения V
+    current_mA = ina219.getCurrent_mA();              // Получение значение тока в мА
+    power_mW = ina219.getPower_mW();                  // Получение значение мощности
+    loadvoltage = busvoltage + (shuntvoltage / 1000); // Расчет напряжение на нагрузки
+    
+    // Поочередно отправляем полученные значение в последовательный порт.
+    return  "\nBus Voltage:   " + String(busvoltage) + " V" +
+            "\nShunt Voltage: " + String(shuntvoltage) + " mV" +
+            "\nLoad Voltage:  " + String(loadvoltage) + " V" +
+            "\nCurrent:       " + String(current_mA) + " mA" +
+            "\nPower:         " + String(power_mW) + " mW" ;
+}
 
 float readBatteryVoltage() {
     uint32_t sum = 0;

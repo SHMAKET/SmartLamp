@@ -25,6 +25,8 @@ void setup() {
     Serial.begin(115200);
     delay(300);
 
+    InitIna219();
+
     WiFi.mode(WIFI_AP);
     WiFi.setTxPower(WIFI_POWER_7dBm);
     WiFi.softAP(AP_SSID, AP_PASS);
@@ -117,7 +119,7 @@ void setupWeb() {
 
     server.on("/batteryStatus", HTTP_GET, [](AsyncWebServerRequest *request) {
         float vbat = readBatteryVoltage();
-        request->send(200, "text/plain", "Battery voltage: " + String(vbat) +"V " + String(voltage2Percent(vbat)) + "%  ");
+        request->send(200, "text/plain", "Battery voltage: " + String(vbat) +"V " + String(voltage2Percent(vbat)) + "%  \n" + InaGet());
     });
 
     server.onNotFound([](AsyncWebServerRequest *request){

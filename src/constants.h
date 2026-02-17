@@ -1,8 +1,10 @@
 #pragma once
 
-#define LED_PIN             14           // пин ленты
-#define BTN_PIN             15           // пин кнопки
-#define ADC_PIN             3           // пин акб через делитель
+#define LED_PIN             19           // пин ленты
+#define BTN_PIN             20           // пин кнопки
+#define ADC_PIN             3            // пин акб через делитель
+#define SCL_PIN             2
+#define SDA_PIN             1
 
 #define WIDTH               ( 16U )     // ширина матрицы
 #define HEIGHT              ( 16U )     // высота матрицы
@@ -28,7 +30,7 @@
 // ================== devoloper  settings ================== 
 
 #define ADC_MAX             4095.0
-#define ADC_REF             3.00
+#define ADC_REF             4.1
 #define DIVIDER_RATIO       2.0
 
 #define NUM_LEDS (uint16_t)(WIDTH * HEIGHT)
