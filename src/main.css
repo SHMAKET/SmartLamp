@@ -2,19 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* burger animation */
+#burgerBtn.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+#burgerBtn.active span:nth-child(2) { opacity: 0; }
+#burgerBtn.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* sun/moon visibility */
+html.dark  .icon-moon { display: none; }
+html.dark  .icon-sun  { display: block; }
+html:not(.dark) .icon-sun  { display: none; }
+html:not(.dark) .icon-moon { display: block; }
+
 @layer base {
     :root {
-        --text: #040326;
-        --background: #f2f1fe;
-        --primary: #150b75;
-        --secondary: #f0725c;
-        --accent: #d3c312;
+        --text: 3 10 23;
+        --background: 255 255 255;
+        --primary: 18 63 129;
+        --secondary: 232 115 104;
+        --accent: 223 207 32;
     }
     .dark {
-        --text: #dbdafc;
-        --background: #000; /*#02010c*/
-        --primary: #958af4;
-        --secondary: #a2240f;
-        --accent: #ecdc2b;
+        --text: 232 239 252;
+        --background: 0 0 0;
+        --primary: 124 169 236;
+        --secondary: 149 32 22;
+        --accent: 223 206 34;
+    }
+}
+
+@layer components {
+    .tab {
+        @apply block px-3 py-2.5 rounded-full text-sm font-medium text-text transition duration-300;
+    }
+    .tab:hover {
+        @apply md:shadow-md md:shadow-primary;
+    }
+    .tab-active {
+        @apply pointer-events-none;
+    }
+    .tab-indicator {
+        @apply absolute left-3 right-3 rounded-full bg-primary/50 transition-all duration-500 -z-10;
     }
 }
