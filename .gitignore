@@ -13,3 +13,5 @@ Thumbs.db
 *FCBak
 # Logs
 *.log
+#builds cahe
+data/web

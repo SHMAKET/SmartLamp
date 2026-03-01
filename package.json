@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm-run-all build:*",
+    "build": "cp -r src_web/icons data/web/ ;npm-run-all build:*",
     "build:css": "tailwindcss -i src_web/main.css -o data/web/styles.css --minify",
     "build:html": "html-minifier-terser --input-dir src_web --output-dir data/web --file-ext html --collapse-whitespace --remove-comments",
     "build:js": "terser src_web/app.js -o data/web/script.js -c -m",
