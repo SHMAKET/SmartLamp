@@ -41,17 +41,34 @@ function updateIndicator() {
     indicator.style.height = r.height + "px";
 }
 
-function switchTab(hash) {
+const loadedTabs = new Set();
+
+async function switchTab(hash) {
     const target = hash || "#home";
+    const id = target.replace("#", "");
 
     tabs.forEach(t => t.classList.remove("tab-active"));
     panels.forEach(p => p.classList.add("hidden"));
 
-    const activeTab = document.querySelector(`.tab[href="${target}"]`);
+    const activeTab   = document.querySelector(`.tab[href="${target}"]`);
     const activePanel = document.querySelector(target);
 
-    if (activeTab)  activeTab.classList.add("tab-active");
+    if (activeTab)   activeTab.classList.add("tab-active");
     if (activePanel) activePanel.classList.remove("hidden");
+
+    if (!loadedTabs.has(id)) {
+        loadedTabs.add(id);
+
+        try {
+            const res = await fetch(`./tabs/${id}.html`);
+            if (res.ok) activePanel.innerHTML = await res.text();
+        } catch (e) {}
+
+        try {
+            const mod = await import(`./tabs/${id}.js`);
+            if (mod.init) mod.init(activePanel);
+        } catch (e) {}
+    }
 
     updateIndicator();
 }
