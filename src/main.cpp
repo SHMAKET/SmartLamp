@@ -6,6 +6,7 @@
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
 #include <WiFi.h>
+#include <ArduinoJson.h>
 
 #include "effectManager.h"
 #include "batteryManager.h"
@@ -18,8 +19,33 @@ AsyncWebServer server(80);
 enum class LampState : uint8_t { OFF, ON };
 LampState currentState = LampState::ON;
 
-void toggleState();
-void setupWeb();
+void setupWeb() {
+    server.serveStatic("/", LittleFS, "/web/").setDefaultFile("index.html");
+
+    server.on("/batinfo", HTTP_GET, [](AsyncWebServerRequest *request) {
+        float batV    = ReadBatV();
+        InaResult ina = ReadIna();
+
+        JsonDocument doc;
+        doc["voltage_V"]    = serialized(String(batV, 3));
+        doc["soc_pct"]      = voltage2Percent(batV, ina.current_mA);
+        doc["current_mA"]   = serialized(String(ina.current_mA, 2));
+        doc["power_mW"]     = serialized(String(ina.power_mW, 2));
+        doc["bus_V"]        = serialized(String(ina.busvoltage, 3));
+        doc["shunt_mV"]     = serialized(String(ina.shuntvoltage, 3));
+
+        String json;
+        serializeJson(doc, json);
+        Serial.println("batInfo: " + json);
+        request->send(200, "application/json", json);
+    });
+
+    server.onNotFound([](AsyncWebServerRequest *request){
+        request->send(404, "text/plain", "Not Found");
+    });
+
+    server.begin();
+}
 
 void setup() {
     Serial.begin(115200);
@@ -69,7 +95,6 @@ void setup() {
     // Set first effect with its default parameters
     effects.setEffect(3);
 
-    // Запускаем файловую систему
     if (!LittleFS.begin()) {
         Serial.println("LittleFS mount failed");
         return;
@@ -85,7 +110,15 @@ void loop() {
     touch.tick();
     
     // single click — on/off
-    if (touch.isSingle()) { toggleState(); }
+    if (touch.isSingle()) { 
+        if (currentState == LampState::OFF) {
+            currentState = LampState::ON;
+        } else {
+            currentState = LampState::OFF;
+            FastLED.clear();
+            FastLED.show();
+        }
+    }
     
     // processing clicks only when lamp ON
     if (currentState == LampState::ON) {
@@ -97,34 +130,4 @@ void loop() {
         uint32_t now = millis();
         if (effects.update(now)) { FastLED.show(); }
     }
-}
-
-void toggleState() {
-    if (currentState == LampState::OFF) {
-        currentState = LampState::ON;
-    } else {
-        currentState = LampState::OFF;
-        FastLED.clear();
-        FastLED.show();
-    }
-}
-
-void setupWeb() {
-    server.serveStatic("/", LittleFS, "/web/").setDefaultFile("index.html");
-
-    server.on("/toggleState", HTTP_GET, [](AsyncWebServerRequest *request) { 
-        toggleState();
-        request->send(200, "text/plain", "OK");
-    });
-
-    server.on("/batteryStatus", HTTP_GET, [](AsyncWebServerRequest *request) {
-        float vbat = readBatteryVoltage();
-        request->send(200, "text/plain", "Battery voltage: " + String(vbat) +"V " + String(voltage2Percent(vbat)) + "%  \n" + InaGet());
-    });
-
-    server.onNotFound([](AsyncWebServerRequest *request){
-        request->send(404, "text/plain", "Not Found");
-    });
-
-    server.begin();
 }
