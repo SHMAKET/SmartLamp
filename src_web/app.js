@@ -25,6 +25,8 @@ burgerBtn.addEventListener('click', () => {
     nav.classList.contains('-translate-x-56') ? openMenu() : closeMenu();
 });
 
+overlay.addEventListener('click', () => { closeMenu(); });
+
 // =========TABS=========
 const indicator = document.getElementById("indicator");
 const tabs      = document.querySelectorAll(".tab");
@@ -41,36 +43,43 @@ function updateIndicator() {
     indicator.style.height = r.height + "px";
 }
 
+const TAB_MODULES = {
+    '#home':     () => import('./tabs/home.js'),
+    '#battery':  () => import('./tabs/battery.js'),
+    '#settings': () => import('./tabs/settings.js'),
+}
 const loadedTabs = new Set();
+let currentModule = null;
+let currentPanel = null;
 
 async function switchTab(hash) {
-    const target = hash || "#home";
-    const id = target.replace("#", "");
+    const target = hash || '#home';
 
-    tabs.forEach(t => t.classList.remove("tab-active"));
-    panels.forEach(p => p.classList.add("hidden"));
+    // --- pause current ---
+    if (currentModule?.pause) currentModule.pause(currentPanel);
+
+    // --- swithc DOM ---
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
 
     const activeTab   = document.querySelector(`.tab[href="${target}"]`);
     const activePanel = document.querySelector(target);
-
-    if (activeTab)   activeTab.classList.add("tab-active");
-    if (activePanel) activePanel.classList.remove("hidden");
-
-    if (!loadedTabs.has(id)) {
-        loadedTabs.add(id);
-
-        try {
-            const res = await fetch(`./tabs/${id}.html`);
-            if (res.ok) activePanel.innerHTML = await res.text();
-        } catch (e) {}
-
-        try {
-            const mod = await import(`./tabs/${id}.js`);
-            if (mod.init) mod.init(activePanel);
-        } catch (e) {}
-    }
-
+    if (activeTab)   activeTab.classList.add('tab-active');
+    if (activePanel) activePanel.classList.remove('hidden');
     updateIndicator();
+
+    if (!TAB_MODULES[target]) return;
+
+    const mod = await TAB_MODULES[target]();
+    currentModule = mod;
+    currentPanel  = activePanel;
+
+    if (!loadedTabs.has(target)) {
+        mod.init?.(activePanel);
+        loadedTabs.add(target);
+    } else {
+        mod.resume?.(activePanel);
+    }
 }
 
 tabs.forEach(tab => {

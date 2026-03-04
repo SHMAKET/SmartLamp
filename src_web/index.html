@@ -6,7 +6,7 @@
     <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
     <title>SmartLamp</title>
     
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="main.css">
 </head>
 <body class="bg-background text-text min-h-screen flex flex-col items-center justify-center transition-colors duration-300 md:px-60">
     <!-- Sidebar nav -->
@@ -32,20 +32,19 @@
     <div id="navOverlay"
         class="fixed inset-0 z-30 md:hidden 
                 bg-black/20 opacity-0 pointer-events-none 
-                transition-all duration-200 ease-in-out"
-        onclick="closeMenu()">
+                transition-all duration-200 ease-in-out">
     </div>
 
     <!-- Burger button (mobile only) -->
     <button id="burgerBtn"
             class="md:hidden fixed top-3 left-3 z-50
                     w-9 h-9 bg-primary rounded-lg
-                    flex flex-col items-center justify-center gap-[5px]
+                    flex flex-col items-center justify-center gap-1.25
                     border-none cursor-pointer hover:scale-110 transition-transform duration-200"
             aria-label="Toggle menu">
-        <span class="block w-[18px] h-0.5 bg-background rounded transition-transform duration-300"></span>
-        <span class="block w-[18px] h-0.5 bg-background rounded transition-opacity duration-300"></span>
-        <span class="block w-[18px] h-0.5 bg-background rounded transition-transform duration-300"></span>
+        <span class="block w-4.5 h-0.5 bg-background rounded transition-transform duration-300"></span>
+        <span class="block w-4.5 h-0.5 bg-background rounded transition-opacity duration-300"></span>
+        <span class="block w-4.5 h-0.5 bg-background rounded transition-transform duration-300"></span>
     </button>
 
     <!-- Theme toggle button -->
@@ -78,11 +77,48 @@
 
     <!-- Main content -->
     <main id="panels" class="flex flex-col items-center justify-center gap-6 p-6 w-full">
-        <section id="home" class="panel"></section>
-        <section id="battery" class="panel hidden"></section>
-        <section id="settings" class="panel hidden"></section>
+        <section id="home" class="panel">
+            <a id="counter1">0</a>
+        </section>
+        <section id="battery" class="panel hidden">
+            <div>
+                <div>
+                    <span>Voltage</span>
+                    <span data-key="voltage_V">—</span>
+                    <span>V</span>
+                </div>
+                <div>
+                    <span>SOC</span>
+                    <span data-key="soc_pct">—</span>
+                    <span>%</span>
+                </div>
+                <div>
+                    <span>Current</span>
+                    <span data-key="current_mA">—</span>
+                    <span>mA</span>
+                </div>
+                <div>
+                    <span>Power</span>
+                    <span data-key="power_mW">—</span>
+                    <span>mW</span>
+                </div>
+                <div>
+                    <span>Bus V</span>
+                    <span data-key="bus_V">—</span>
+                    <span>V</span>
+                </div>
+                <div>
+                    <span>Shunt</span>
+                    <span data-key="shunt_mV">—</span>
+                    <span>mV</span>
+                </div>
+            </div>
+        </section>
+        <section id="settings" class="panel hidden">
+            <a id="counter3">0</a>
+        </section>
     </main>
 
-    <script src="script.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

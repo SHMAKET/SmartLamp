@@ -1,17 +1,14 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* burger animation */
-#burgerBtn.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-#burgerBtn.active span:nth-child(2) { opacity: 0; }
-#burgerBtn.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+@variant dark (&:where(.dark, .dark *));
 
-/* sun/moon visibility */
-html.dark  .icon-moon { display: none; }
-html.dark  .icon-sun  { display: block; }
-html:not(.dark) .icon-sun  { display: none; }
-html:not(.dark) .icon-moon { display: block; }
+@theme {
+    --color-text:        rgb(var(--text));
+    --color-background:  rgb(var(--background));
+    --color-primary:     rgb(var(--primary));
+    --color-secondary:   rgb(var(--secondary));
+    --color-accent:      rgb(var(--accent));
+}
 
 @layer base {
     :root {
@@ -29,6 +26,17 @@ html:not(.dark) .icon-moon { display: block; }
         --accent: 223 206 34;
     }
 }
+
+/* burger animation */
+#burgerBtn.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+#burgerBtn.active span:nth-child(2) { opacity: 0; }
+#burgerBtn.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* sun/moon visibility */
+html.dark  .icon-moon { display: none; }
+html.dark  .icon-sun  { display: block; }
+html:not(.dark) .icon-sun  { display: none; }
+html:not(.dark) .icon-moon { display: block; }
 
 @layer components {
     .tab {
