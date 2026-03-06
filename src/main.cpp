@@ -22,7 +22,7 @@ LampState currentState = LampState::ON;
 void setupWeb() {
     server.serveStatic("/", LittleFS, "/web/").setDefaultFile("index.html");
 
-    server.on("/batinfo", HTTP_GET, [](AsyncWebServerRequest *request) {
+    server.on("/api/batinfo", HTTP_GET, [](AsyncWebServerRequest *request) {
         float batV    = ReadBatV();
         InaResult ina = ReadIna();
 
@@ -36,12 +36,25 @@ void setupWeb() {
 
         String json;
         serializeJson(doc, json);
-        Serial.println("batInfo: " + json);
+        //Serial.println("batInfo: " + json);
         request->send(200, "application/json", json);
     });
 
-    server.onNotFound([](AsyncWebServerRequest *request){
-        request->send(404, "text/plain", "Not Found");
+    server.on("/api/effectsList", HTTP_GET, [](AsyncWebServerRequest *request) {
+        JsonDocument doc;
+        JsonArray arr = doc.to<JsonArray>();
+
+        for (uint8_t i = 0; i < effects.getEffectCount(); i++) {
+            const EffectDescriptor* desc = effects.getEffectDescriptor(i);
+            JsonObject obj = arr.add<JsonObject>();
+            obj["id"]   = i;
+            obj["name"] = desc->name;
+        }
+
+        String json;
+        serializeJson(doc, json);
+        //Serial.println("Effects: " + json);
+        request->send(200, "application/json", json);
     });
 
     server.begin();

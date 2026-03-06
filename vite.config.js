@@ -23,5 +23,13 @@ export default defineConfig({
                 { src: 'icons/*', dest: 'icons' }
             ]
         })*/
-    ]
+    ],
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://192.168.3.1',
+                changeOrigin: true
+            }
+        }
+    }
 })

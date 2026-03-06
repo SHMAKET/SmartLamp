@@ -38,6 +38,28 @@ html.dark  .icon-sun  { display: block; }
 html:not(.dark) .icon-sun  { display: none; }
 html:not(.dark) .icon-moon { display: block; }
 
+/* Dropdown animation */
+.dropdown { display: none; }
+.dropdown.open {
+    display: block;
+    animation: fadeDown .15s ease;
+}
+@keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.chevron { transition: transform .15s; }
+.chevron.open { transform: rotate(180deg); }
+
+/* Scrollbar */
+#list::-webkit-scrollbar { width: 4px; }
+#list::-webkit-scrollbar-track { background: transparent; }
+#list::-webkit-scrollbar-thumb {
+    background: rgb(var(--primary) / .3);
+    border-radius: 2px;
+}
+
 @layer components {
     .tab {
         @apply block px-3 py-2.5 rounded-full text-sm font-medium text-text transition duration-300;

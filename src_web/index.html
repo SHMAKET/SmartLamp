@@ -76,46 +76,86 @@
     </button>
 
     <!-- Main content -->
-    <main id="panels" class="flex flex-col items-center justify-center gap-6 p-6 w-full">
+    <main id="panels" class="flex flex-col items-center justify-center gap-6 p-6">
+<!-- =====HOME================================ -->
         <section id="home" class="panel">
-            <a id="counter1">0</a>
-        </section>
-        <section id="battery" class="panel hidden">
-            <div>
-                <div>
-                    <span>Voltage</span>
-                    <span data-key="voltage_V">—</span>
-                    <span>V</span>
-                </div>
-                <div>
-                    <span>SOC</span>
-                    <span data-key="soc_pct">—</span>
-                    <span>%</span>
-                </div>
-                <div>
-                    <span>Current</span>
-                    <span data-key="current_mA">—</span>
-                    <span>mA</span>
-                </div>
-                <div>
-                    <span>Power</span>
-                    <span data-key="power_mW">—</span>
-                    <span>mW</span>
-                </div>
-                <div>
-                    <span>Bus V</span>
-                    <span data-key="bus_V">—</span>
-                    <span>V</span>
-                </div>
-                <div>
-                    <span>Shunt</span>
-                    <span data-key="shunt_mV">—</span>
-                    <span>mV</span>
+
+            <div class="relative z-10 w-80" id="cb">
+                <label class="block text-xs font-semibold mb-2 tracking-wider text-primary/80">
+                    ✦ Effect
+                </label>
+    <!-- Trigger -->
+                <button class="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm
+                                text-text border transition-all
+                                border-primary/20 bg-background/10 backdrop-blur-md
+                                hover:bg-primary/10 hover:border-primary/40">
+                    <span id="btn-label" class="text-text/30 transition-colors">Выберите эффект...</span>
+                    <svg id="chevron" class="chevron w-4 h-4 text-primary/60 shrink-0"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+    <!-- Dropdown -->
+                <div id="dropdown" class="dropdown absolute mt-2 w-full rounded-xl overflow-hidden 
+                                        border border-primary/20 bg-background/60 backdrop-blur-2xl"
+                    style="box-shadow: 0 20px 40px rgb(var(--background) / .4), 0 0 0 1px rgb(var(--primary) / .15)">
+    <!-- Search -->
+                    <div class="p-2.5 border-b border-primary/10">
+                        <div class="flex items-center gap-2 rounded-lg px-3 py-2 transition-colors 
+                                    bg-primary/5 border border-primary/10">
+                            <svg class="w-3.5 h-3.5 text-primary/50 shrink-0"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <input
+                                id="search"
+                                placeholder="Поиск эффекта..."
+                                class="flex-1 bg-transparent text-sm outline-none min-w-0
+                                    text-text placeholder-text/20"
+                            />
+                            <button id="clear-btn"
+                                    class="text-text/20 hover:text-text/60 transition-colors hidden text-lg leading-none">
+                                ×
+                            </button>
+                        </div>
+                    </div>
+    <!-- List -->
+                    <ul id="list" class="max-h-56 overflow-y-auto px-2 py-2"></ul>
+    <!-- Footer -->
+                    <div id="count"
+                        class="mx-2 mb-2 px-3 py-1.5 rounded-lg text-center text-xs font-mono
+                                bg-primary/5 text-text/20">
+                    </div>
                 </div>
             </div>
         </section>
+<!-- =====HOME================================ -->
+<!-- =====BATTERY============================= -->
+        <section id="battery" class="panel hidden">
+            <div>
+                <div>
+                    <span>Voltage</span> <span data-key="voltage_V">—</span> <span>V</span>
+                </div>
+                <div>
+                    <span>SOC</span> <span data-key="soc_pct">—</span> <span>%</span>
+                </div>
+                <div>
+                    <span>Current</span> <span data-key="current_mA">—</span> <span>mA</span>
+                </div>
+                <div>
+                    <span>Power</span> <span data-key="power_mW">—</span> <span>mW</span>
+                </div>
+                <div>
+                    <span>Bus V</span> <span data-key="bus_V">—</span> <span>V</span>
+                </div>
+                <div>
+                    <span>Shunt</span> <span data-key="shunt_mV">—</span><span>mV</span>
+                </div>
+            </div>
+        </section>
+<!-- =====BATTERY============================= -->
         <section id="settings" class="panel hidden">
-            <a id="counter3">0</a>
+            <a id="counter">0</a>
         </section>
     </main>
 

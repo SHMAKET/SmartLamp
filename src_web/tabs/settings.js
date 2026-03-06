@@ -1,9 +1,18 @@
-export function init(panel) {
-    let count = 0;
-    const counterElement = document.getElementById("counter3");
+let intervalId = null;
+let count = 0;
 
-    setInterval(() => {
+export function init(panel) {
+    resume(panel);
+}
+
+export function pause() {
+    clearInterval(intervalId);
+    intervalId = null;
+}
+
+export function resume(panel) {
+    intervalId = setInterval(() => {
         count++;
-        counterElement.textContent = count;
+        panel.querySelector('#counter').textContent = count;
     }, 1000);
 }

@@ -12,7 +12,7 @@ export function pause() {
 export function resume(panel) {
     const update = async () => {
         try {
-            const data = await fetch('/batinfo').then(r => r.json());
+            const data = await fetch('/api/batinfo').then(r => r.json());
             panel.querySelectorAll('[data-key]').forEach(el => {
                 const val = data[el.dataset.key];
                 el.textContent = val !== undefined ? val.toFixed(2) : '—';
