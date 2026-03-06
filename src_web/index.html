@@ -8,7 +8,15 @@
     
     <link rel="stylesheet" href="main.css">
 </head>
-<body class="bg-background text-text min-h-screen flex flex-col items-center justify-center transition-colors duration-300 md:px-60">
+<body class="bg-background text-text min-h-screen flex flex-col items-center pt-10 transition-colors duration-300 md:px-60">
+
+    <!-- Decorative blobs so backdrop-blur has texture to work with -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none" id="blobs">
+        <div class="blob absolute w-[clamp(250px,30vw,700px)] h-[clamp(250px,30vw,700px)] rounded-full bg-primary/30 blur-[80px]"></div>
+        <div class="blob absolute w-[clamp(250px,30vw,700px)] h-[clamp(250px,30vw,700px)] rounded-full bg-secondary/20 blur-[60px]"></div>        
+        <div class="blob absolute w-[clamp(250px,30vw,700px)] h-[clamp(250px,30vw,700px)] rounded-full bg-accent/25 blur-[70px]"></div>
+    </div>
+
     <!-- Sidebar nav -->
     <nav id="nav"
         class="fixed top-3 left-3 bottom-3 w-52 z-40

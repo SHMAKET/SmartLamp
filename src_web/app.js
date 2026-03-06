@@ -97,3 +97,54 @@ window.addEventListener("popstate", () => switchTab(location.hash));
 const ro = new ResizeObserver(() => updateIndicator());
 ro.observe(document.body);
 // =========TABS=========
+
+const blobs = document.querySelectorAll(".blob");
+
+const isMobile = window.innerWidth < 768;
+
+function animate(blob, index) {
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    let zoneStart, zoneSize;
+
+    if (isMobile) {
+        zoneSize = vh / blobs.length;
+        zoneStart = zoneSize * index;
+    } else {
+        zoneSize = vw / blobs.length;
+        zoneStart = zoneSize * index;
+    }
+
+    const rect = blob.getBoundingClientRect();
+
+    let x, y;
+
+    if (isMobile) {
+        x = Math.random() * (vw - rect.width);
+        y = zoneStart + Math.random() * (zoneSize - rect.height);
+    } else {
+        x = zoneStart + Math.random() * (zoneSize - rect.width);
+        y = Math.random() * (vh - rect.height);
+    }
+
+    const scale = 0.8 + Math.random() * 0.6;
+    const duration = 15000 + Math.random() * 10000;
+
+    blob.animate(
+        {
+            transform: `translate(${x}px, ${y}px) scale(${scale})`
+        },
+        {
+            duration: duration,
+            easing: "ease-in-out",
+            fill: "forwards"
+        }
+    ).onfinish = () => animate(blob, index);
+}
+
+blobs.forEach((blob, i) => {
+    blob.style.transform = `translate(0,0)`;
+    animate(blob, i);
+});
