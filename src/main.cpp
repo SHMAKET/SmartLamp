@@ -10,6 +10,7 @@
 
 #include "effectManager.h"
 #include "batteryManager.h"
+#include "websocket.h"
 
 CRGB leds[NUM_LEDS];
 EffectManager effects(leds);
@@ -36,7 +37,6 @@ void setupWeb() {
 
         String json;
         serializeJson(doc, json);
-        //Serial.println("batInfo: " + json);
         request->send(200, "application/json", json);
     });
 
@@ -53,9 +53,10 @@ void setupWeb() {
 
         String json;
         serializeJson(doc, json);
-        //Serial.println("Effects: " + json);
         request->send(200, "application/json", json);
     });
+
+    initWebSocket(server, &effects);
 
     server.begin();
 }

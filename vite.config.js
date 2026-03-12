@@ -29,6 +29,11 @@ export default defineConfig({
             '/api': {
                 target: 'http://192.168.3.1',
                 changeOrigin: true
+            },
+            '/ws': {
+                target: 'http://192.168.3.1',
+                ws: true,
+                changeOrigin: true
             }
         }
     }

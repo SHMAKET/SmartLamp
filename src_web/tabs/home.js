@@ -6,6 +6,7 @@ const pct    = (v, mn, mx) => ((v - mn) / (mx - mn)) * 100;
 let panel    = null;
 let effects  = [];
 let selected = null;
+let ws = new WebSocket(`ws://${location.host}/ws`);
 
 // ── Refs ───────────────────────────────────────────────────────────────────
 let elTrigger, elDropdown, elChevron, elSearch, elClearBtn, elBtnLabel, elList, elCount;
@@ -42,6 +43,20 @@ export async function init(rootPanel) {
 
     renderList(effects);
     updateCount(effects.length);
+
+    selectItem(3);
+
+    ws.onmessage = (e) => {
+        let d = JSON.parse(e.data);
+
+        if(d.b) panel.querySelector('#br').value = d.b
+        if(d.s) panel.querySelector('#sp').value = d.s
+        if(d.k) panel.querySelector('#kf').value = d.k
+    }
+
+    panel.querySelector('#br').dispatchEvent(new Event('input'));
+    panel.querySelector('#sp').dispatchEvent(new Event('input'));
+    panel.querySelector('#kf').dispatchEvent(new Event('input'));
 }
 
 export function resume(_panel) {
@@ -151,6 +166,8 @@ function initBrightness(panel) {
         panel.querySelector('#br-chip').textContent = v;
         panel.querySelector('#br-fill').style.width = pct(v, 0, 255) + '%';
         
+        ws.send(JSON.stringify({b:Number(input.value)}));
+        
         updateHex(panel,
             panel.querySelector('#br'),
             panel.querySelector('#sp'),
@@ -164,6 +181,8 @@ function initSpeed(panel) {
         const v = +input.value;
         panel.querySelector('#sp-chip').textContent = v;
         panel.querySelector('#sp-fill').style.width = pct(v, 0, 255) + '%';
+        
+        ws.send(JSON.stringify({s:Number(input.value)}));
 
         updateHex(panel,
             panel.querySelector('#br'),
@@ -193,6 +212,8 @@ function initKFactor(panel) {
             neg.style.left  = (ZERO_PCT - w) + '%';
             neg.style.width = w + '%';
         }
+
+        ws.send(JSON.stringify({k:Number(input.value)}));
 
         updateHex(panel,
             panel.querySelector('#br'),
