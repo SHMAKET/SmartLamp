@@ -60,12 +60,12 @@ async function switchTab(hash) {
 
     // --- swithc DOM ---
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.replace('flex', 'hidden'));
 
     const activeTab   = document.querySelector(`.tab[href="${target}"]`);
     const activePanel = document.querySelector(target);
     if (activeTab)   activeTab.classList.add('tab-active');
-    if (activePanel) activePanel.classList.remove('hidden');
+    if (activePanel) activePanel.classList.replace('hidden', 'flex');
     updateIndicator();
 
     if (!TAB_MODULES[target]) return;
@@ -97,12 +97,11 @@ window.addEventListener("popstate", () => switchTab(location.hash));
 const ro = new ResizeObserver(() => updateIndicator());
 ro.observe(document.body);
 // =========TABS=========
-
 const blobs = document.querySelectorAll(".blob");
 
 const isMobile = window.innerWidth < 768;
 
-function animate(blob, index) {
+function getPosition(blob, index) {
 
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -128,9 +127,15 @@ function animate(blob, index) {
         x = zoneStart + Math.random() * (zoneSize - rect.width);
         y = Math.random() * (vh - rect.height);
     }
+    return { x, y };
+}
 
-    const scale = 0.8 + Math.random() * 0.6;
-    const duration = 15000 + Math.random() * 10000;
+function animate(blob, index) {
+
+    const { x, y } = getPosition(blob, index);
+
+    const scale = 0.8 + Math.random() * 0.3;
+    const duration = 1500 + Math.random() * 1000;
 
     blob.animate(
         {
@@ -145,6 +150,7 @@ function animate(blob, index) {
 }
 
 blobs.forEach((blob, i) => {
-    blob.style.transform = `translate(0,0)`;
+    const { x, y } = getPosition(blob, i);
+    blob.style.transform = `translate(${x}px, ${y}px)`;
     animate(blob, i);
 });

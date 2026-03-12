@@ -1,5 +1,7 @@
 // tabs/home.js
-
+const ZERO_PCT = (128 / 255) * 100;
+const toHex2 = n => Math.abs(n).toString(16).padStart(2, '0').toUpperCase();
+const pct    = (v, mn, mx) => ((v - mn) / (mx - mn)) * 100;
 // ── State ──────────────────────────────────────────────────────────────────
 let panel    = null;
 let effects  = [];
@@ -24,6 +26,11 @@ export async function init(rootPanel) {
     elTrigger.addEventListener('click', toggle);
     elSearch.addEventListener('input', onSearch);
     elClearBtn.addEventListener('click', clearSearch);
+
+    initBrightness(panel);
+    initSpeed(panel);
+    initKFactor(panel);
+
 
     try {
         const res = await fetch('/api/effectsList');
@@ -128,4 +135,68 @@ function selectItem(id) {
 
 function updateCount(shown) {
     elCount.textContent = `${shown} / ${effects.length}`;
+}
+
+function updateHex(panel, br, sp, kf) {
+    const kv = +kf.value;
+    panel.querySelector('#hex-row').textContent =
+        `0x${toHex2(+br.value)} · 0x${toHex2(+sp.value)} · ${kv >= 0 ? '+' : '-'}0x${toHex2(kv)}`;
+}
+
+
+function initBrightness(panel) {
+    const input = panel.querySelector('#br');
+    input.addEventListener('input', () => {
+        const v = +input.value;
+        panel.querySelector('#br-chip').textContent = v;
+        panel.querySelector('#br-fill').style.width = pct(v, 0, 255) + '%';
+        
+        updateHex(panel,
+            panel.querySelector('#br'),
+            panel.querySelector('#sp'),
+            panel.querySelector('#kf'));
+    });
+}
+
+function initSpeed(panel) {
+    const input = panel.querySelector('#sp');
+    input.addEventListener('input', () => {
+        const v = +input.value;
+        panel.querySelector('#sp-chip').textContent = v;
+        panel.querySelector('#sp-fill').style.width = pct(v, 0, 255) + '%';
+
+        updateHex(panel,
+            panel.querySelector('#br'),
+            panel.querySelector('#sp'),
+            panel.querySelector('#kf'));
+    });
+}
+
+function initKFactor(panel) {
+    const input = panel.querySelector('#kf');
+    const neg   = panel.querySelector('#kf-neg');
+    const pos   = panel.querySelector('#kf-pos');
+
+    input.addEventListener('input', () => {
+        const v = +input.value;
+        panel.querySelector('#kf-chip').textContent = v >= 0 ? '+' + v : String(v);
+        neg.classList.add('hidden');
+        pos.classList.add('hidden');
+
+        if (v > 0) {
+            pos.classList.remove('hidden');
+            pos.style.left  = ZERO_PCT + '%';
+            pos.style.width = (v / 255 * 100) + '%';
+        } else if (v < 0) {
+            const w = Math.abs(v) / 255 * 100;
+            neg.classList.remove('hidden');
+            neg.style.left  = (ZERO_PCT - w) + '%';
+            neg.style.width = w + '%';
+        }
+
+        updateHex(panel,
+            panel.querySelector('#br'),
+            panel.querySelector('#sp'),
+            panel.querySelector('#kf'));
+    });
 }
