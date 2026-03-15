@@ -154,3 +154,17 @@ blobs.forEach((blob, i) => {
     blob.style.transform = `translate(${x}px, ${y}px)`;
     animate(blob, i);
 });
+
+document.querySelectorAll('.btn, .btn-grad-border').forEach(btn => {
+    btn.addEventListener('pointerdown', function(e) {
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height) * 1.6;
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top  - size / 2;
+        const r = document.createElement('span');
+        r.className = 'ripple';
+        r.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px;`;
+        this.appendChild(r);
+        r.addEventListener('animationend', () => r.remove());
+    });
+});

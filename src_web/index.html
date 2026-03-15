@@ -14,9 +14,9 @@
 
     <!-- Decorative blobs so backdrop-blur has texture to work with -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none" id="blobs">
-        <div class="blob absolute w-[clamp(250px,30vw,700px)] h-[clamp(250px,30vw,700px)] rounded-full bg-primary/30 blur-[80px]"></div>
-        <div class="blob absolute w-[clamp(250px,30vw,700px)] h-[clamp(250px,30vw,700px)] rounded-full bg-secondary/20 blur-[60px]"></div>        
-        <div class="blob absolute w-[clamp(250px,30vw,700px)] h-[clamp(250px,30vw,700px)] rounded-full bg-accent/25 blur-[70px]"></div>
+        <div class="blob absolute w-[clamp(250px,30vw,700px)] h-[clamp(250px,30vw,700px)] rounded-full bg-primary/20 blur-[80px]"></div>
+        <div class="blob absolute w-[clamp(250px,30vw,700px)] h-[clamp(250px,30vw,700px)] rounded-full bg-secondary/15 blur-[60px]"></div>        
+        <div class="blob absolute w-[clamp(250px,30vw,700px)] h-[clamp(250px,30vw,700px)] rounded-full bg-accent/16 blur-[70px]"></div>
     </div>
 
     <!-- Sidebar nav -->
@@ -101,7 +101,7 @@
                                     text-text border transition-all
                                     border-primary/20 bg-background/10 backdrop-blur-md
                                     hover:bg-primary/10 hover:border-primary/40">
-                        <span id="btn-label" class="text-text/30 transition-colors">Выберите эффект...</span>
+                        <span id="btn-label" class="text-text/30 transition-colors">Select effect...</span>
                         <svg id="chevron" class="chevron w-4 h-4 text-primary/60 shrink-0"
                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -121,7 +121,7 @@
                                 </svg>
                                 <input
                                     id="search"
-                                    placeholder="Поиск эффекта..."
+                                    placeholder="searching..."
                                     class="flex-1 bg-transparent text-sm outline-none min-w-0
                                         text-text placeholder-text/20"
                                 />
@@ -205,6 +205,17 @@
                 <p id="hex-row" class="text-center mt-2.5 text-[11.5px] font-['Google_Sans_Mono'] c-muted">
                     0x00 · 0x00 · +0x00
                 </p>
+
+                <div class="flex justify-center gap-3">
+                    <button id="dbtn" class="btn btn-primary btn-pill mx-auto">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"> <polyline points="20 6 9 17 4 12"/> </svg>
+                        Default
+                    </button>
+                    <button id="rbtn" class="btn btn-primary btn-pill mx-auto">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"> <polyline points="16 3 21 3 21 8"/> <line x1="4" y1="20" x2="21" y2="3"/> <polyline points="21 16 21 21 16 21"/> <line x1="15" y1="15" x2="21" y2="21"/> </svg>
+                        Random
+                    </button>
+                </div>
 
             </div>
             

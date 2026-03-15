@@ -9,7 +9,8 @@ let selected = null;
 let ws = new WebSocket(`ws://${location.host}/ws`);
 
 // ── Refs ───────────────────────────────────────────────────────────────────
-let elTrigger, elDropdown, elChevron, elSearch, elClearBtn, elBtnLabel, elList, elCount;
+let elTrigger, elDropdown, elChevron, elSearch, elClearBtn, elBtnLabel, elList, elCount, 
+    brSlider, spSlider, kfSlider;
 
 // ── Lifecycle ──────────────────────────────────────────────────────────────
 export async function init(rootPanel) {
@@ -23,6 +24,9 @@ export async function init(rootPanel) {
     elBtnLabel = panel.querySelector('#btn-label');
     elList     = panel.querySelector('#list');
     elCount    = panel.querySelector('#count');
+    brSlider   = panel.querySelector('#br');
+    spSlider   = panel.querySelector('#sp');
+    kfSlider   = panel.querySelector('#kf');
 
     elTrigger.addEventListener('click', toggle);
     elSearch.addEventListener('input', onSearch);
@@ -49,14 +53,26 @@ export async function init(rootPanel) {
     ws.onmessage = (e) => {
         let d = JSON.parse(e.data);
 
-        if(d.b) panel.querySelector('#br').value = d.b
-        if(d.s) panel.querySelector('#sp').value = d.s
-        if(d.k) panel.querySelector('#kf').value = d.k
+        if(d.b) brSlider.value = d.b
+        if(d.s) spSlider.value = d.s
+        if(d.k) kfSlider.value = d.k
     }
 
-    panel.querySelector('#br').dispatchEvent(new Event('input'));
-    panel.querySelector('#sp').dispatchEvent(new Event('input'));
-    panel.querySelector('#kf').dispatchEvent(new Event('input'));
+    brSlider.dispatchEvent(new Event('input'));
+    spSlider.dispatchEvent(new Event('input'));
+    kfSlider.dispatchEvent(new Event('input'));
+
+    panel.querySelector('#dbtn').addEventListener('click', async () => {
+        // NOT IMPLEMENTED
+    });
+
+    panel.querySelector('#rbtn').addEventListener('click', () => {
+        spSlider.value = Math.floor(Math.random() * 256);       // 0..255
+        spSlider.dispatchEvent(new Event('input'));
+
+        kfSlider.value = Math.floor(Math.random() * 256) - 128; // -128..127
+        kfSlider.dispatchEvent(new Event('input'));
+    });
 }
 
 export function resume(_panel) {
@@ -116,9 +132,9 @@ function clearSearch() {
 function renderList(items) {
     if (!items.length) {
         elList.innerHTML = `
-        <li class="px-3 py-3 text-sm text-center text-text/30">
-            Ничего не найдено
-        </li>`;
+            <li class="px-3 py-3 text-sm text-center text-text/30">
+                nothing found
+            </li>`;
         return;
     }
 
@@ -158,46 +174,36 @@ function updateHex(panel, br, sp, kf) {
         `0x${toHex2(+br.value)} · 0x${toHex2(+sp.value)} · ${kv >= 0 ? '+' : '-'}0x${toHex2(kv)}`;
 }
 
-
 function initBrightness(panel) {
-    const input = panel.querySelector('#br');
-    input.addEventListener('input', () => {
-        const v = +input.value;
+    brSlider.addEventListener('input', () => {
+        const v = +brSlider.value;
         panel.querySelector('#br-chip').textContent = v;
         panel.querySelector('#br-fill').style.width = pct(v, 0, 255) + '%';
         
-        ws.send(JSON.stringify({b:Number(input.value)}));
+        ws.send(JSON.stringify({b:Number(brSlider.value)}));
         
-        updateHex(panel,
-            panel.querySelector('#br'),
-            panel.querySelector('#sp'),
-            panel.querySelector('#kf'));
+        updateHex(panel, brSlider,spSlider, kfSlider);
     });
 }
 
 function initSpeed(panel) {
-    const input = panel.querySelector('#sp');
-    input.addEventListener('input', () => {
-        const v = +input.value;
+    spSlider.addEventListener('input', () => {
+        const v = +spSlider.value;
         panel.querySelector('#sp-chip').textContent = v;
         panel.querySelector('#sp-fill').style.width = pct(v, 0, 255) + '%';
         
-        ws.send(JSON.stringify({s:Number(input.value)}));
+        ws.send(JSON.stringify({s:Number(spSlider.value)}));
 
-        updateHex(panel,
-            panel.querySelector('#br'),
-            panel.querySelector('#sp'),
-            panel.querySelector('#kf'));
+        updateHex(panel, brSlider, spSlider, kfSlider);
     });
 }
 
 function initKFactor(panel) {
-    const input = panel.querySelector('#kf');
     const neg   = panel.querySelector('#kf-neg');
     const pos   = panel.querySelector('#kf-pos');
 
-    input.addEventListener('input', () => {
-        const v = +input.value;
+    kfSlider.addEventListener('input', () => {
+        const v = +kfSlider.value;
         panel.querySelector('#kf-chip').textContent = v >= 0 ? '+' + v : String(v);
         neg.classList.add('hidden');
         pos.classList.add('hidden');
@@ -213,11 +219,8 @@ function initKFactor(panel) {
             neg.style.width = w + '%';
         }
 
-        ws.send(JSON.stringify({k:Number(input.value)}));
+        ws.send(JSON.stringify({k:Number(kfSlider.value)}));
 
-        updateHex(panel,
-            panel.querySelector('#br'),
-            panel.querySelector('#sp'),
-            panel.querySelector('#kf'));
+        updateHex(panel, brSlider, spSlider, kfSlider);
     });
 }
