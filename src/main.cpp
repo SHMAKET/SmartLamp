@@ -21,7 +21,7 @@ enum class LampState : uint8_t { OFF, ON };
 LampState currentState = LampState::ON;
 
 void setupWeb() {
-    server.serveStatic("/", LittleFS, "/web/").setDefaultFile("index.html");
+    server.serveStatic("/", LittleFS, "/web/").setDefaultFile("index.html").setCacheControl("max-age=600");
 
     server.on("/api/batinfo", HTTP_GET, [](AsyncWebServerRequest *request) {
         float batV    = ReadBatV();

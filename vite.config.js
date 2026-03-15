@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
 import tailwindcss from '@tailwindcss/vite'
-//import { viteStaticCopy } from 'vite-plugin-static-copy'
+import viteCompression from 'vite-plugin-compression'
 
 export default defineConfig({
     root: 'src_web',
@@ -18,11 +18,10 @@ export default defineConfig({
     },
     plugins: [
         tailwindcss(),
-        /*viteStaticCopy({
-            targets: [
-                { src: 'icons/*', dest: 'icons' }
-            ]
-        })*/
+        viteCompression({
+            algorithm: 'gzip',
+            ext: '.gz'
+        })
     ],
     server: {
         proxy: {
